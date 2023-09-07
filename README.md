@@ -33,6 +33,7 @@ $ npm run test:cov
 ### Tarefas
 
 - CRUD Planos (iniciante, intermediário, avançado, expert)
+
   - id
   - nome do plano
   - data de criação
@@ -40,6 +41,7 @@ $ npm run test:cov
   - data de deleção
 
 - CRUD Empresa
+
   - id
   - id externo
   - nome da empresa
@@ -50,6 +52,7 @@ $ npm run test:cov
   - Salvar DATA DO SALDO INICIAL:
 
 - CRUD Usuário
+
   - id
   - nome do usuário
   - email
@@ -60,6 +63,7 @@ $ npm run test:cov
   - id empresa (relacionamento)
 
 - CRUD Fornecedores
+
   - id
   - nome do fornecedor
   - cnpj
@@ -71,6 +75,7 @@ $ npm run test:cov
   - id empresa (relacionamento)
 
 - CRUD clientes
+
   - id
   - nome
   - cnpj/cpf
@@ -82,6 +87,7 @@ $ npm run test:cov
   - id empresa (relacionamento)
 
 - CRUD Bancos
+
   - id
   - nome do banco
   - saldo no banco
@@ -91,6 +97,7 @@ $ npm run test:cov
   - id empresa (relacionamento)
 
 - CRUD plano de contas categorias
+
   - id
   - nome da categoria
   - código da categoria (ex: 1.1)
@@ -101,6 +108,7 @@ $ npm run test:cov
   - id empresa (relacionamento)
 
 - CRUD plano de contas subcategorias
+
   - id
   - nome da subcategoria
   - código da subcategoria (ex: 1.1.1)
@@ -111,6 +119,7 @@ $ npm run test:cov
   - id empresa (relacionamento)
 
 - CRUD Orçamentos
+
   - id
   - tipo da categoria (receita ou despesa)
   - id da categoria (relacionamento)
@@ -122,6 +131,7 @@ $ npm run test:cov
   - data de deleção
 
 - CRUD projetos
+
   - id
   - nome (Consolidado, filial1, filial2)
   - id empresa (relacionamento)
@@ -130,6 +140,7 @@ $ npm run test:cov
   - data de deleção
 
 - CRUD documentos
+
   - id
   - nome (boleto, nota fiscal, etc)
   - id empresa (relacionamento)
@@ -138,6 +149,7 @@ $ npm run test:cov
   - data de deleção
 
 - CRUD Lançamentos contas
+
   - id
   - id empresa (relacionamento)
   - tipo lançamento (a receber, a pagar)
