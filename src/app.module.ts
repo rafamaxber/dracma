@@ -1,4 +1,10 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule } from '@nestjs/throttler';
+
+import { HealthModule } from './health/health.module';
+import { PrismaModule } from './database/prisma/prisma.module';
+
 import { PlansModule } from './modules/plans/plans.module';
 import { CompanyModule } from './modules/company/company.module';
 import { UserModule } from './modules/user/user.module';
@@ -12,10 +18,20 @@ import { ProjectModule } from './modules/project/project.module';
 import { DocumentModule } from './modules/document/document.module';
 import { AccountModule } from './modules/account/account.module';
 import { TransferModule } from './modules/transfer/transfer.module';
-import { PrismaModule } from './database/prisma/prisma.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      cache: true,
+      isGlobal: true,
+      envFilePath: '.development.env',
+    }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 10,
+      },
+    ]),
     PlansModule,
     CompanyModule,
     UserModule,
@@ -30,6 +46,7 @@ import { PrismaModule } from './database/prisma/prisma.module';
     AccountModule,
     TransferModule,
     PrismaModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
