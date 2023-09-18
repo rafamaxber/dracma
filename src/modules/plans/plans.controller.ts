@@ -13,6 +13,7 @@ import { UpdatePlanDto } from './dto/update-plan.dto';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { PlanEntity } from './entities/plan.entity';
 
+//TODO: Add ApiBearerAuth decorator to only allow authenticated admins of dracma to access this controller
 @ApiTags('Plans')
 @Controller('plans')
 export class PlansController {
