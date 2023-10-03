@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 
-import { HealthModule } from './health/health.module';
+import { HealthModule } from './infra/health/health.module';
 import { PrismaModule } from './database/prisma/prisma.module';
 
 import { PlansModule } from './modules/plans/plans.module';
