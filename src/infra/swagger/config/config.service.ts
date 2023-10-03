@@ -1,5 +1,5 @@
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import * as packageJson from '../../../package.json';
+import * as packageJson from '../../../../package.json';
 
 export function configSwagger(app) {
   const config = new DocumentBuilder()
