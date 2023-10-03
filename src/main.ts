@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
-import { configSwagger } from './infra/swagger/config/config.service';
+import { configSwagger } from './infra/swagger/config.service';
 import { setGlobalListAppRoutes } from './global-list-app-routes/setGlobalListAppRoutes';
 import { VersioningType } from '@nestjs/common';
 import helmet from 'helmet';
