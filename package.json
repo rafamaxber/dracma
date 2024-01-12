@@ -31,7 +31,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "up": "docker-compose up --build -d",
     "down": "docker-compose down --remove-orphans",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prisma:studio": "npx prisma studio"
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.0",

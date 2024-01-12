@@ -19,7 +19,7 @@ async function bootstrap() {
   });
 
   configSwagger(app);
-  await app.listen(3000);
+  await app.listen(3001);
 
   setGlobalListAppRoutes(app);
 }
