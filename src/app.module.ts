@@ -18,6 +18,10 @@ import { ProjectModule } from './modules/project/project.module';
 import { DocumentModule } from './modules/document/document.module';
 import { AccountModule } from './modules/account/account.module';
 import { TransferModule } from './modules/transfer/transfer.module';
+import { AuthModule } from './modules/user-auth/auth.module';
+import { AuthGuard } from './modules/user-auth/auth.guard';
+import { JwtModule } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -32,6 +36,14 @@ import { TransferModule } from './modules/transfer/transfer.module';
         limit: 10,
       },
     ]),
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET,
+      signOptions: {
+        expiresIn: process.env.JWT_EXPIRES_IN,
+      },
+    }),
+    AuthModule,
     PlansModule,
     CompanyModule,
     UserModule,
@@ -47,6 +59,12 @@ import { TransferModule } from './modules/transfer/transfer.module';
     TransferModule,
     PrismaModule,
     HealthModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
   ],
 })
 export class AppModule {}

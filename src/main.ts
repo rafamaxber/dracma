@@ -17,9 +17,11 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: '1',
   });
-
+  const port = process.env.PORT || 3031;
   configSwagger(app);
-  await app.listen(3001);
+  await app.listen(port);
+
+  console.log(`Application is running on: ${process.env.API_ENDPOINT}`);
 
   setGlobalListAppRoutes(app);
 }

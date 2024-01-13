@@ -7,6 +7,9 @@ export class UserEntity implements User {
   @ApiProperty({ required: false })
   id: number;
 
+  @ApiProperty({ required: false })
+  idExternal: string;
+
   @IsString()
   @ApiProperty({ required: true })
   firstName: string;
