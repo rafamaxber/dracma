@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { RegisterUsecase } from './use-cases/register';
 import { UserAlreadyExistsException } from '../../exceptions/user-already-exists-exception';
 import { SignInUsecase } from './use-cases/sign-in';
-import { SigInUserDto } from './dto/sig-in-user.dto';
+import { SigInUserDto } from './dto/sigin-user.dto';
 import { Public } from './public.decorator';
 
 @Controller('auth')

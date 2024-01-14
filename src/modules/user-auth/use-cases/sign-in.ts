@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { PrismaService } from '../../../database/prisma/prisma.service';
 import { HashService } from '../../../cripto/hash/hash.service';
-import { SigInUserDto } from '../dto/sig-in-user.dto';
+import { SigInUserDto } from '../dto/sigin-user.dto';
 import { UserAuthType } from '../entity/user-auth';
 
 @Injectable()

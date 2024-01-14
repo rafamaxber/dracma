@@ -19,7 +19,7 @@ export class UserEntity implements User {
   lastName: string;
 
   @IsString()
-  @ApiProperty({ required: true })
+  @ApiProperty({ required: false })
   nickName: string;
 
   @IsEmail()

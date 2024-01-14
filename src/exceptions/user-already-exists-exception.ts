@@ -1,7 +1,8 @@
-import { ExceptionFilter } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 
+@Catch(UserAlreadyExistsException)
 export class UserAlreadyExistsException implements ExceptionFilter {
-  catch(_, host) {
+  catch(exception, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();

@@ -20,18 +20,18 @@ model Plans {
 }
 
 model Company {
-  id                 Int           @id @default(autoincrement())
-  idExternal         String        @unique @default(cuid())
+  id                 Int               @id @default(autoincrement())
+  idExternal         String            @unique @default(cuid())
   name               String
-  plan               Plans?        @relation(fields: [planId], references: [id])
+  plan               Plans?            @relation(fields: [planId], references: [id])
   planId             Int?
   initialBalanceDate DateTime
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
   deletedAt          DateTime?
   User               User[]
   Supplier           Supplier[]
-  Client             Client[]
+  Customer           Customer[]
   Bank               Bank[]
   Category           Category[]
   Subcategory        Subcategory[]
@@ -40,11 +40,12 @@ model Company {
   Document           Document[]
   Account            Account[]
   Transfer           Transfer[]
+  ProductCategory    ProductCategory[]
 }
 
 model User {
   id         Int       @id @default(autoincrement())
-  idExternal String?    @unique @default(cuid())
+  idExternal String?   @unique @default(cuid())
   firstName  String
   lastName   String
   nickName   String
@@ -57,27 +58,37 @@ model User {
   deletedAt  DateTime?
 }
 
+model ProductCategory {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  company   Company   @relation(fields: [companyId], references: [id])
+  companyId Int
+}
+
 model Supplier {
   id        Int       @id @default(autoincrement())
   name      String
   cnpj      String
   email     String
   phone     String
-  company   Company?  @relation(fields: [companyId], references: [id])
-  companyId Int?
+  company   Company   @relation(fields: [companyId], references: [id])
+  companyId Int
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 }
 
-model Client {
+model Customer {
   id        Int       @id @default(autoincrement())
   name      String
   cnpj      String
   email     String
   phone     String
-  company   Company?  @relation(fields: [companyId], references: [id])
-  companyId Int?
+  company   Company   @relation(fields: [companyId], references: [id])
+  companyId Int
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -88,8 +99,8 @@ model Bank {
   id        Int       @id @default(autoincrement())
   name      String
   balance   Float
-  company   Company?  @relation(fields: [companyId], references: [id])
-  companyId Int?
+  company   Company   @relation(fields: [companyId], references: [id])
+  companyId Int
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -101,8 +112,8 @@ model Category {
   name        String
   code        String
   type        String
-  company     Company?      @relation(fields: [companyId], references: [id])
-  companyId   Int?
+  company     Company       @relation(fields: [companyId], references: [id])
+  companyId   Int
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   deletedAt   DateTime?
@@ -117,8 +128,8 @@ model Subcategory {
   code       String
   category   Category? @relation(fields: [categoryId], references: [id])
   categoryId Int?
-  company    Company?  @relation(fields: [companyId], references: [id])
-  companyId  Int?
+  company    Company   @relation(fields: [companyId], references: [id])
+  companyId  Int
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
@@ -132,8 +143,8 @@ model Budget {
   categoryId Int?
   date       DateTime
   value      Float
-  company    Company?  @relation(fields: [companyId], references: [id])
-  companyId  Int?
+  company    Company   @relation(fields: [companyId], references: [id])
+  companyId  Int
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
@@ -142,8 +153,8 @@ model Budget {
 model Project {
   id        Int       @id @default(autoincrement())
   name      String
-  company   Company?  @relation(fields: [companyId], references: [id])
-  companyId Int?
+  company   Company   @relation(fields: [companyId], references: [id])
+  companyId Int
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -153,8 +164,8 @@ model Project {
 model Document {
   id        Int       @id @default(autoincrement())
   name      String
-  company   Company?  @relation(fields: [companyId], references: [id])
-  companyId Int?
+  company   Company   @relation(fields: [companyId], references: [id])
+  companyId Int
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -175,8 +186,8 @@ model Account {
   projectId     Int?
   subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
   subcategoryId Int?
-  client        Client?      @relation(fields: [clientId], references: [id])
-  clientId      Int?
+  customer      Customer?    @relation(fields: [customerId], references: [id])
+  customerId    Int?
   description   String
   bank          Bank?        @relation(fields: [bankId], references: [id])
   bankId        Int?
