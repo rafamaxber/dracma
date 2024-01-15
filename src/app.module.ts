@@ -22,9 +22,13 @@ import { AuthModule } from './modules/user-auth/auth.module';
 import { AuthGuard } from './modules/user-auth/auth.guard';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_GUARD } from '@nestjs/core';
+import { HttpModule } from '@nestjs/axios';
+import { EmailModule } from './email/email-module';
 
 @Module({
   imports: [
+    HttpModule,
+    EmailModule,
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,

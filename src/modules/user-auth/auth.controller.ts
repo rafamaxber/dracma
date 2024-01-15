@@ -5,18 +5,36 @@ import { UserAlreadyExistsException } from '../../exceptions/user-already-exists
 import { SignInUsecase } from './use-cases/sign-in';
 import { SigInUserDto } from './dto/sigin-user.dto';
 import { Public } from './public.decorator';
+import { ForgotPasswordUsecase } from './use-cases/forgot-password';
+import { ForgotPasswordUserDto } from './dto/forgot-password-user.dto';
+import { ResetPasswordUsecase } from './use-cases/reset-password';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private registerUsecase: RegisterUsecase,
     private signInUsecase: SignInUsecase,
+    private forgotPasswordUsecase: ForgotPasswordUsecase,
+    private resetPasswordUsecase: ResetPasswordUsecase,
   ) {}
 
   @Public()
   @Post('login')
   async signIn(@Body() sigInUserDto: SigInUserDto) {
     return this.signInUsecase.execute(sigInUserDto);
+  }
+
+  @Public()
+  @Post('forgot-password')
+  async forgotPassword(@Body() forgotPasswordUserDto: ForgotPasswordUserDto) {
+    return this.forgotPasswordUsecase.execute(forgotPasswordUserDto);
+  }
+
+  @Public()
+  @Post('reset-password')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.resetPasswordUsecase.execute(resetPasswordDto);
   }
 
   @Public()
