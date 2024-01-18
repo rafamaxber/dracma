@@ -36,7 +36,7 @@ export class SignInUsecase {
 
     const tokenPayloadData: UserAuthType = {
       id: user.idExternal,
-      companyId: String(user.companyId),
+      companyId: user?.companyId ? String(user.companyId) : null,
       firstName: user.firstName,
       lastName: user.lastName,
       nickName: user.nickName,

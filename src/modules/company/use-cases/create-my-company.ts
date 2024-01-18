@@ -2,9 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma/prisma.service';
 import { CreateMyCompanyDto } from '../dto/create-my-company.dto';
 
+import { UserAuthType } from '../../../modules/user-auth/entity/user-auth';
+import { JwtService } from '@nestjs/jwt';
+
 @Injectable()
 export class CreateMyCompanyUsecase {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
   async execute(body: CreateMyCompanyDto) {
     const {
       // description,
@@ -14,17 +20,16 @@ export class CreateMyCompanyUsecase {
       planId = null,
     } = body;
 
-    const { id: internalUserId, companyId: userCompanyId } =
-      await this.prismaService.user.findUnique({
-        where: {
-          idExternal: userId,
-        },
-      });
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        idExternal: userId,
+      },
+    });
 
     const result = await this.prismaService.$transaction(async (tsx) => {
       const company = await tsx.company.upsert({
         create: {
-          id: internalUserId,
+          id: user.id,
           // description,
           initialBalanceDate,
           name,
@@ -35,11 +40,11 @@ export class CreateMyCompanyUsecase {
           planId,
         },
         where: {
-          id: internalUserId,
+          id: user.id,
         },
       });
 
-      if (userCompanyId) {
+      if (user.companyId) {
         return company;
       }
 
@@ -55,6 +60,18 @@ export class CreateMyCompanyUsecase {
       return company;
     });
 
-    return result;
+    const tokenPayloadData: UserAuthType = {
+      id: user.idExternal,
+      companyId: result.idExternal,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      nickName: user.nickName,
+    };
+
+    const token = await this.jwtService.signAsync(tokenPayloadData);
+
+    return {
+      access_token: token,
+    };
   }
 }
