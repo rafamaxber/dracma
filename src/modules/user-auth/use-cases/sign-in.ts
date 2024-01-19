@@ -16,6 +16,9 @@ export class SignInUsecase {
 
   async execute({ email, password }: SigInUserDto): Promise<any> {
     const user = await this.prismaService.user.findUnique({
+      include: {
+        company: true,
+      },
       where: {
         email,
       },
@@ -36,7 +39,7 @@ export class SignInUsecase {
 
     const tokenPayloadData: UserAuthType = {
       id: user.idExternal,
-      companyId: user?.companyId ? String(user.companyId) : null,
+      companyId: user?.company?.idExternal ? user.company.idExternal : null,
       firstName: user.firstName,
       lastName: user.lastName,
       nickName: user.nickName,

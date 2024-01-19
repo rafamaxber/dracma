@@ -6,23 +6,47 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { SubcategoryService } from './subcategory.service';
 import { CreateSubcategoryDto } from './dto/create-subcategory.dto';
 import { UpdateSubcategoryDto } from './dto/update-subcategory.dto';
+import { User, UserType } from '../user-auth/user.decorator';
 
 @Controller('subcategory')
 export class SubcategoryController {
   constructor(private readonly subcategoryService: SubcategoryService) {}
 
   @Post()
-  create(@Body() createSubcategoryDto: CreateSubcategoryDto) {
-    return this.subcategoryService.create(createSubcategoryDto);
+  create(
+    @Body() createSubcategoryDto: CreateSubcategoryDto,
+    @User() user: UserType,
+  ) {
+    const { companyId } = user;
+    return this.subcategoryService.create(companyId, createSubcategoryDto);
   }
 
   @Get()
-  findAll() {
-    return this.subcategoryService.findAll();
+  findAll(
+    @Query('perPage') perPage: number,
+    @Query('page') page: number,
+    @Query('name') name: string,
+    @User() user: UserType,
+  ) {
+    const { companyId } = user;
+    const filters = Object.assign(
+      {},
+      name && {
+        name: {
+          contains: name,
+        },
+      },
+    );
+    return this.subcategoryService.findAll(companyId, {
+      perPage,
+      filters,
+      page,
+    });
   }
 
   @Get(':id')

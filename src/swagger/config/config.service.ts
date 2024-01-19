@@ -6,6 +6,7 @@ export function configSwagger(app) {
     .setTitle('Dracma API')
     .setDescription('The Dracma API description')
     .setVersion(packageJson.version)
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

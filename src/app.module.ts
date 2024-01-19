@@ -26,6 +26,7 @@ import { AuthGuard } from './modules/user-auth/auth.guard';
 import { EmailModule } from './email/email-module';
 
 import { LoggerMiddleware } from '../middleware/logger.middleware';
+import { ProductCategoryModule } from './modules/product-category/product-category.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { LoggerMiddleware } from '../middleware/logger.middleware';
     DocumentModule,
     AccountModule,
     TransferModule,
+    ProductCategoryModule,
     PrismaModule,
     HealthModule,
   ],

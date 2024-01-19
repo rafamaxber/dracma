@@ -6,23 +6,37 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { TransferService } from './transfer.service';
 import { CreateTransferDto } from './dto/create-transfer.dto';
 import { UpdateTransferDto } from './dto/update-transfer.dto';
+import { User, UserType } from '../user-auth/user.decorator';
 
 @Controller('transfer')
 export class TransferController {
   constructor(private readonly transferService: TransferService) {}
 
   @Post()
-  create(@Body() createTransferDto: CreateTransferDto) {
-    return this.transferService.create(createTransferDto);
+  create(@Body() createTransferDto: CreateTransferDto, @User() user: UserType) {
+    const { companyId } = user;
+    return this.transferService.create(companyId, createTransferDto);
   }
 
-  @Get()
-  findAll() {
-    return this.transferService.findAll();
+  findAll(
+    @Query('perPage') perPage: number,
+    @Query('page') page: number,
+    @Query('q') q: string,
+    @User() user: UserType,
+  ) {
+    const { companyId } = user;
+    return this.transferService.findAll(companyId, {
+      perPage,
+      filters: {
+        name: q,
+      },
+      page,
+    });
   }
 
   @Get(':id')

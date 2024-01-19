@@ -6,23 +6,44 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { SupplierService } from './supplier.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
+import { User, UserType } from '../user-auth/user.decorator';
 
 @Controller('supplier')
 export class SupplierController {
   constructor(private readonly supplierService: SupplierService) {}
 
   @Post()
-  create(@Body() createSupplierDto: CreateSupplierDto) {
-    return this.supplierService.create(createSupplierDto);
+  create(@Body() createSupplierDto: CreateSupplierDto, @User() user: UserType) {
+    const { companyId } = user;
+    return this.supplierService.create(companyId, createSupplierDto);
   }
 
   @Get()
-  findAll() {
-    return this.supplierService.findAll();
+  findAll(
+    @Query('perPage') perPage: number,
+    @Query('page') page: number,
+    @Query('name') name: string,
+    @User() user: UserType,
+  ) {
+    const { companyId } = user;
+    const filters = Object.assign(
+      {},
+      name && {
+        name: {
+          contains: name,
+        },
+      },
+    );
+    return this.supplierService.findAll(companyId, {
+      perPage,
+      filters,
+      page,
+    });
   }
 
   @Get(':id')
