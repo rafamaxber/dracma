@@ -1,31 +1,49 @@
-import { HttpService } from '@nestjs/axios';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { Resend } from 'resend';
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { getRenderedEmail } from './templates/get-rendered-email.js';
+import { emailTemplateConfig } from './templates/template-constants.js';
+
+interface SendEmailServiceParams {
+  to: string;
+  template: string;
+  data: Record<string, unknown>;
+  from?: string;
+  subject?: string;
+}
 
 @Injectable()
 export class SendEmailService {
-  constructor(private readonly httpService: HttpService) {}
+  private readonly emailProvider = new Resend(process.env.RESEND_EMAIL_TOKEN);
 
-  async execute({ from, to, subject, text }) {
-    console.log('SendEmailService:: ', from);
+  async execute({ from, to, subject, template, data }: SendEmailServiceParams) {
+    const { text, html } = await getRenderedEmail(template, data);
+    const config = emailTemplateConfig[template];
 
-    const response = this.httpService.post(
-      `https://www.mailinator.com/api/v2/domains/public/webhook/${process.env.MAILINATOR_TOKEN}/`,
-      {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('SendEmailService:: ', {
         from,
-        subject,
-        text: String(text),
         to,
-        msgType: 'text',
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    );
+        subject,
+        template,
+        data,
+        ...config,
+      });
 
-    return response.subscribe(() => {
-      console.log('email enviado com sucesso:: ');
+      return;
+    }
+
+    this.emailProvider.emails.send({
+      to: [to],
+      html,
+      text,
+      subject: subject || config.subject,
+      from: from || config.from,
+      tags: config.tags,
     });
+
+    return true;
   }
 }

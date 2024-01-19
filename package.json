@@ -32,7 +32,8 @@
     "up": "docker-compose up --build -d",
     "down": "docker-compose down --remove-orphans",
     "prepare": "husky install",
-    "prisma:studio": "npx prisma studio"
+    "prisma:studio": "npx prisma studio",
+    "preview:email": "cd src/email/templates/email-preview && npm run dev"
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.0",
@@ -46,12 +47,14 @@
     "@nestjs/terminus": "^10.1.1",
     "@nestjs/throttler": "^5.0.0",
     "@prisma/client": "^5.0.0",
+    "@react-email/components": "0.0.13",
     "axios": "^1.5.0",
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "helmet": "^7.0.0",
     "reflect-metadata": "^0.1.13",
+    "resend": "^2.1.0",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.0"
   },
@@ -62,6 +65,8 @@
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.59.11",
     "@typescript-eslint/parser": "^5.59.11",
