@@ -18,7 +18,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @ApiTags('Product Category')
 @Controller('product-category')
 export class ProductCategoryController {
-  constructor(private readonly categoryService: ProductCategoryService) {}
+  constructor(private readonly service: ProductCategoryService) {}
 
   @Post()
   create(
@@ -26,18 +26,22 @@ export class ProductCategoryController {
     @User() user: UserType,
   ) {
     const { companyId } = user;
-    return this.categoryService.create(companyId, createCategoryDto);
+    return this.service.create(companyId, createCategoryDto);
   }
 
   @Get()
   findAll(
-    @Query('perPage') perPage: number,
-    @Query('page') page: number,
+    @Query('perPage') perPage = null,
+    @Query('page') page = null,
     @Query('name') name: string,
-    @User() user: UserType,
+    // filterQueryDto: FilterQueryDto = { name: '' },
+    @User()
+    user: UserType,
   ) {
+    // const { name } = filterQueryDto;
     const { companyId } = user;
     const cleanName = String(name).trim();
+
     const filters = Object.assign(
       {},
       name && {
@@ -46,7 +50,7 @@ export class ProductCategoryController {
         },
       },
     );
-    return this.categoryService.findAll(companyId, {
+    return this.service.findAll(companyId, {
       perPage,
       filters,
       page,
@@ -56,7 +60,7 @@ export class ProductCategoryController {
   @Get(':id')
   findOne(@Param('id') id: string, @User() user: UserType) {
     const { companyId } = user;
-    return this.categoryService.findOne(companyId, +id);
+    return this.service.findOne(companyId, +id);
   }
 
   @Patch(':id')
@@ -66,12 +70,12 @@ export class ProductCategoryController {
     @User() user: UserType,
   ) {
     const { companyId } = user;
-    return this.categoryService.update(companyId, +id, updateCategoryDto);
+    return this.service.update(companyId, +id, updateCategoryDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string, @User() user: UserType) {
     const { companyId } = user;
-    return this.categoryService.remove(companyId, +id);
+    return this.service.remove(companyId, +id);
   }
 }

@@ -20,7 +20,12 @@ async function bootstrap() {
   });
   const port = process.env.PORT || 3031;
   configSwagger(app);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+    }),
+  );
   app.useGlobalFilters(new HttpExceptionFilter());
   await app.listen(port);
 

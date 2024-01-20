@@ -4,6 +4,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_GUARD } from '@nestjs/core';
 import { HttpModule } from '@nestjs/axios';
+import { CacheModule } from '@nestjs/cache-manager';
 
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './database/prisma/prisma.module';
@@ -23,13 +24,21 @@ import { AccountModule } from './modules/account/account.module';
 import { TransferModule } from './modules/transfer/transfer.module';
 import { AuthModule } from './modules/user-auth/auth.module';
 import { AuthGuard } from './modules/user-auth/auth.guard';
-import { EmailModule } from './email/email-module';
+import { ProductModule } from './modules/product/product.module';
 
+import { EmailModule } from './email/email-module';
 import { LoggerMiddleware } from '../middleware/logger.middleware';
 import { ProductCategoryModule } from './modules/product-category/product-category.module';
+import { UnitsModule } from './modules/units/units.module';
+import { FeedstockModule } from './modules/feedstock/feedstock.module';
+import { ProductRecipesModule } from './modules/product-recipes/product-recipes.module';
+import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
   imports: [
+    CacheModule.register({
+      isGlobal: true,
+    }),
     HttpModule,
     EmailModule,
     ConfigModule.forRoot({
@@ -67,6 +76,11 @@ import { ProductCategoryModule } from './modules/product-category/product-catego
     ProductCategoryModule,
     PrismaModule,
     HealthModule,
+    ProductModule,
+    UnitsModule,
+    FeedstockModule,
+    ProductRecipesModule,
+    OrdersModule,
   ],
   providers: [
     {

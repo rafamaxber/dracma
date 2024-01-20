@@ -7,12 +7,4 @@ export class CategoryService extends GenericCrud {
   constructor(private readonly prismaService: PrismaService) {
     super(prismaService.category);
   }
-
-  async create(body: any): Promise<any> {
-    const result = await this.prismaService.category.create({
-      data: body,
-    });
-
-    return result;
-  }
 }

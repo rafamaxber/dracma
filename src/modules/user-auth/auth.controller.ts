@@ -9,7 +9,9 @@ import { ForgotPasswordUsecase } from './use-cases/forgot-password';
 import { ForgotPasswordUserDto } from './dto/forgot-password-user.dto';
 import { ResetPasswordUsecase } from './use-cases/reset-password';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(

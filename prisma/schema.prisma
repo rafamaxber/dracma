@@ -10,6 +10,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Status {
+  open
+  closed
+  canceled
+}
+
+enum Role {
+  admin
+  user_admin
+  user
+}
+
 model Plans {
   id        Int       @id @default(autoincrement())
   name      String
@@ -19,28 +31,46 @@ model Plans {
   Company   Company[]
 }
 
+model Unit {
+  id               Int                @id @default(autoincrement())
+  name             String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  deletedAt        DateTime?
+  Product          Product[]
+  ProductFeedstock ProductFeedstock[]
+  ProductRecipe    ProductRecipe[]
+}
+
 model Company {
-  id                 Int               @id @default(autoincrement())
-  idExternal         String            @unique @default(cuid())
+  id                 Int        @id @default(autoincrement())
+  idExternal         String     @unique @default(cuid())
   name               String
-  plan               Plans?            @relation(fields: [planId], references: [id])
+  plan               Plans?     @relation(fields: [planId], references: [id])
   planId             Int?
   initialBalanceDate DateTime
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
   deletedAt          DateTime?
   User               User[]
   Supplier           Supplier[]
-  Customer           Customer[]
-  Bank               Bank[]
-  Category           Category[]
-  Subcategory        Subcategory[]
-  Budget             Budget[]
-  Project            Project[]
-  Document           Document[]
-  Account            Account[]
-  Transfer           Transfer[]
-  ProductCategory    ProductCategory[]
+
+  Customer             Customer[]
+  Bank                 Bank[]
+  Category             Category[]
+  Subcategory          Subcategory[]
+  Budget               Budget[]
+  Project              Project[]
+  Document             Document[]
+  Account              Account[]
+  Transfer             Transfer[]
+  ProductCategory      ProductCategory[]
+  Product              Product[]
+  Product_Category_Map Product_Category_Map[]
+  ProductRecipe        ProductRecipe[]
+  Feedstock            ProductFeedstock[]
+  Order                Order[]
+  ProductImages        ProductImages[]
 }
 
 model User {
@@ -48,7 +78,7 @@ model User {
   idExternal String?   @unique @default(cuid())
   firstName  String
   lastName   String
-  nickName   String
+  nickName   String    @unique
   email      String    @unique
   password   String
   company    Company?  @relation(fields: [companyId], references: [id])
@@ -56,29 +86,22 @@ model User {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
-}
-
-model ProductCategory {
-  id        Int       @id @default(autoincrement())
-  name      String
-  companyId Int
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  company   Company   @relation(fields: [companyId], references: [id])
+  Order      Order[]
 }
 
 model Supplier {
-  id        Int       @id @default(autoincrement())
+  id        Int                @id @default(autoincrement())
   name      String
   cnpj      String
   email     String
   phone     String
-  company   Company   @relation(fields: [companyId], references: [id])
+  company   Company            @relation(fields: [companyId], references: [id])
   companyId Int
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
   deletedAt DateTime?
+  Feedstock ProductFeedstock[]
+  Product   Product[]
 }
 
 model Customer {
@@ -93,6 +116,7 @@ model Customer {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   Account   Account[]
+  Order     Order[]
 }
 
 model Bank {
@@ -212,4 +236,140 @@ model Transfer {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?
+}
+
+model Product {
+  id                       Int                    @id @default(autoincrement())
+  name                     String
+  code                     String?                @unique @default(cuid())
+  canBeResold              Boolean?               @default(true)
+  price_sell               Float?
+  price_cost               Float?
+  manufacturer             Boolean?
+  barcode                  String?
+  status                   String?                @default("active")
+  quantity                 Int?
+  description              String?
+  weight                   Float?
+  stock                    Boolean?               @default(false)
+  stock_min                Int?
+  stock_max                Int?
+  removeFeedstockFromStock Boolean?               @default(false)
+  unit                     Unit?                  @relation(fields: [unitId], references: [id])
+  unitId                   Int?
+  companyId                Int
+  company                  Company                @relation(fields: [companyId], references: [id])
+  createdAt                DateTime               @default(now())
+  updatedAt                DateTime               @updatedAt
+  deletedAt                DateTime?
+  supplierId               Int?
+  supplier                 Supplier?              @relation(fields: [supplierId], references: [id])
+  productImages            ProductImages[]
+  product_category_map     Product_Category_Map[]
+  recipe                   ProductRecipe[]
+  ProductCategory          ProductCategory[]
+  OrderItem                OrderItem[]
+}
+
+model ProductCategory {
+  id                   Int                    @id @default(autoincrement())
+  name                 String
+  deletedAt            DateTime?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  companyId            Int
+  company              Company                @relation(fields: [companyId], references: [id])
+  product              Product[]
+  Product_Category_Map Product_Category_Map[]
+}
+
+model Product_Category_Map {
+  id         Int             @id @default(autoincrement())
+  product    Product         @relation(fields: [productId], references: [id])
+  productId  Int
+  category   ProductCategory @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  company    Company         @relation(fields: [companyId], references: [id])
+  companyId  Int
+  deletedAt  DateTime?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@unique([companyId, productId, categoryId])
+}
+
+model ProductImages {
+  id        Int      @id @default(autoincrement())
+  imageUrl  String
+  isMain    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  company   Company  @relation(fields: [companyId], references: [id])
+  companyId Int
+}
+
+model ProductFeedstock {
+  id            Int             @id @default(autoincrement())
+  name          String
+  description   String
+  unit          Unit?           @relation(fields: [unitId], references: [id])
+  unitId        Int?
+  quantity      Float
+  supplier      Supplier        @relation(fields: [supplierId], references: [id])
+  supplierId    Int
+  price         Float
+  company       Company         @relation(fields: [companyId], references: [id])
+  companyId     Int
+  deletedAt     DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  ProductRecipe ProductRecipe[]
+}
+
+model ProductRecipe {
+  id          Int              @id @default(autoincrement())
+  productId   Int
+  feedstock   ProductFeedstock @relation(fields: [feedstockId], references: [id])
+  feedstockId Int
+  quantity    Float
+  unit        Unit?            @relation(fields: [unitId], references: [id])
+  unitId      Int?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  product     Product          @relation(fields: [productId], references: [id])
+  Company     Company?         @relation(fields: [companyId], references: [id])
+  companyId   Int?
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  idExternal  String      @unique @default(cuid())
+  status      Status      @default(open)
+  seller      User        @relation(fields: [userId], references: [id])
+  userId      Int
+  customer    Customer    @relation(fields: [customerId], references: [id])
+  customerId  Int
+  sendInvoice Boolean     @default(false)
+  orderItems  OrderItem[]
+  company     Company     @relation(fields: [companyId], references: [id])
+  companyId   Int
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        Int       @id @default(autoincrement())
+  order     Order     @relation(fields: [orderId], references: [id])
+  orderId   Int
+  product   Product   @relation(fields: [productId], references: [id])
+  productId Int
+  quantity  Int
+  price     Float
+  discount  Float
+  note      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }

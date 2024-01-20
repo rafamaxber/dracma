@@ -12,7 +12,10 @@ import { SupplierService } from './supplier.service';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { User, UserType } from '../user-auth/user.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('Supplier')
 @Controller('supplier')
 export class SupplierController {
   constructor(private readonly supplierService: SupplierService) {}
@@ -47,20 +50,24 @@ export class SupplierController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.supplierService.findOne(+id);
+  findOne(@Param('id') id: string, @User() user: UserType) {
+    const { companyId } = user;
+    return this.supplierService.findOne(companyId, +id);
   }
 
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateSupplierDto: UpdateSupplierDto,
+    @Body() updateDto: UpdateSupplierDto,
+    @User() user: UserType,
   ) {
-    return this.supplierService.update(+id, updateSupplierDto);
+    const { companyId } = user;
+    return this.supplierService.update(companyId, +id, updateDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.supplierService.remove(+id);
+  remove(@Param('id') id: string, @User() user: UserType) {
+    const { companyId } = user;
+    return this.supplierService.remove(companyId, +id);
   }
 }

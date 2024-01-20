@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 interface FindAllParams {
   perPage?: number;
@@ -11,22 +12,17 @@ interface FindAllParams {
 
 @Injectable()
 export class GenericCrud {
+  @Inject(CACHE_MANAGER) private cacheManager: Cache;
+
   constructor(private readonly instance) {}
 
-  async create<T = any>(tenantId: string, body: T) {
-    const company = await new PrismaService().company.findFirstOrThrow({
-      where: {
-        idExternal: tenantId,
-      },
-      select: {
-        id: true,
-      },
-    });
+  async create<T = any>(companyExternalId: string, body: T) {
+    const tennatId = await this.findTenantIdByCompanyId(companyExternalId);
 
     const result = await this.instance.create({
       data: {
-        companyId: company.id,
         ...body,
+        companyId: tennatId,
       },
     });
 
@@ -34,47 +30,43 @@ export class GenericCrud {
   }
 
   async findAll(
-    tenantId: string,
+    companyExternalId: string,
     {
-      perPage = 5,
-      page = 1,
+      perPage,
+      page,
       orderBy = 'updatedAt',
       orderType = 'desc',
+      // TODO: Precisa aplicar validação nesse campo, tem risco grande de SQL Injection
       filters = {},
     }: FindAllParams,
   ) {
-    const { id: companyId } =
-      await new PrismaService().company.findFirstOrThrow({
-        where: {
-          idExternal: tenantId,
-        },
-        select: {
-          id: true,
-        },
-      });
+    const mappedFilters = {
+      perPage: Number(perPage || 5),
+      page: page || 1,
+      filters: filters || {},
+    };
+    const tennatId = await this.findTenantIdByCompanyId(companyExternalId);
 
     const [total, results] = await new PrismaService().$transaction([
       this.instance.count({
         where: {
-          companyId,
-          AND: {
-            deletedAt: null,
-            ...filters,
-          },
+          ...filters,
+          companyId: tennatId,
+          deletedAt: null,
         },
       }),
       this.instance.findMany({
-        take: Number(perPage),
-        skip: Math.round(Math.abs(page - 1) * Number(perPage)),
+        take: mappedFilters.perPage,
+        skip: Math.round(
+          Math.abs(mappedFilters.page - 1) * Number(mappedFilters.perPage),
+        ),
         orderBy: {
           [orderBy]: orderType,
         },
         where: {
-          companyId,
-          AND: {
-            deletedAt: null,
-            ...filters,
-          },
+          companyId: tennatId,
+          deletedAt: null,
+          ...mappedFilters.filters,
         },
       }),
     ]);
@@ -82,30 +74,19 @@ export class GenericCrud {
     return {
       results,
       pagination: {
-        page,
-        perPage,
+        page: mappedFilters.page,
+        perPage: mappedFilters.perPage,
         total,
       },
     };
   }
 
-  async findOne(tenantId: string, id: number) {
-    const { id: companyId } =
-      await new PrismaService().company.findFirstOrThrow({
-        where: {
-          idExternal: tenantId,
-          AND: {
-            deletedAt: null,
-          },
-        },
-        select: {
-          id: true,
-        },
-      });
+  async findOne(companyExternalId: string, id: number) {
+    const tennatId = await this.findTenantIdByCompanyId(companyExternalId);
 
     const result = await this.instance.findFirstOrThrow({
       where: {
-        companyId,
+        companyId: tennatId,
         AND: {
           id: id,
           deletedAt: null,
@@ -116,23 +97,12 @@ export class GenericCrud {
     return result;
   }
 
-  async update(tenantId, id: number, body) {
-    const { id: companyId } =
-      await new PrismaService().company.findFirstOrThrow({
-        where: {
-          idExternal: tenantId,
-          AND: {
-            deletedAt: null,
-          },
-        },
-        select: {
-          id: true,
-        },
-      });
+  async update<T = any>(companyExternalId, id: number, body: T) {
+    const tennatId = await this.findTenantIdByCompanyId(companyExternalId);
 
     const result = await this.instance.update({
       where: {
-        companyId,
+        companyId: tennatId,
         AND: {
           id: id,
           deletedAt: null,
@@ -144,22 +114,12 @@ export class GenericCrud {
     return result;
   }
 
-  async remove(tenantId, id: number) {
-    const { id: companyId } =
-      await new PrismaService().company.findFirstOrThrow({
-        where: {
-          idExternal: tenantId,
-          AND: {
-            deletedAt: null,
-          },
-        },
-        select: {
-          id: true,
-        },
-      });
+  async remove(companyExternalId: string, id: number) {
+    const tennatId = await this.findTenantIdByCompanyId(companyExternalId);
+
     const result = await this.instance.update({
       where: {
-        companyId,
+        companyId: tennatId,
         AND: {
           id: id,
         },
@@ -169,5 +129,27 @@ export class GenericCrud {
       },
     });
     return result;
+  }
+
+  async findTenantIdByCompanyId(companyExternalId: string): Promise<number> {
+    const cachedTenantId = await this.cacheManager.get(companyExternalId);
+    if (cachedTenantId) {
+      Logger.debug('GenericCrud::GET cached tenant id');
+      return Number(cachedTenantId);
+    }
+
+    const { id } = await new PrismaService().company.findFirstOrThrow({
+      where: {
+        idExternal: companyExternalId,
+      },
+      select: {
+        id: true,
+      },
+    });
+    const ttl = 1000 * 60 * 60; // 1 hour
+    Logger.debug('GenericCrud::SET cached tenant id');
+    this.cacheManager.set(companyExternalId, id, ttl);
+
+    return id;
   }
 }

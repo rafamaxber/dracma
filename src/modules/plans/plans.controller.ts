@@ -6,14 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { PlansService } from './plans.service';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { PlanEntity } from './entities/plan.entity';
+import { User, UserType } from '../user-auth/user.decorator';
 
-//TODO: Add ApiBearerAuth decorator to only allow authenticated admins of dracma to access this controller
+@ApiBearerAuth()
 @ApiTags('Plans')
 @Controller('plans')
 export class PlansController {
@@ -21,27 +23,54 @@ export class PlansController {
 
   @Post()
   @ApiCreatedResponse({ type: PlanEntity })
-  create(@Body() createPlanDto: CreatePlanDto) {
-    return this.plansService.create(createPlanDto);
+  create(@Body() createPlanDto: CreatePlanDto, @User() user: UserType) {
+    const { companyId } = user;
+    return this.plansService.create(companyId, createPlanDto);
   }
 
   @Get()
-  findAll() {
-    return this.plansService.findAll();
+  findAll(
+    @Query('perPage') perPage: number,
+    @Query('page') page: number,
+    @Query('name') name: string,
+    @User() user: UserType,
+  ) {
+    const { companyId } = user;
+    const cleanName = String(name).trim();
+    const filters = Object.assign(
+      {},
+      name && {
+        name: {
+          contains: cleanName,
+        },
+      },
+    );
+    return this.plansService.findAll(companyId, {
+      perPage,
+      filters,
+      page,
+    });
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.plansService.findOne(+id);
+  findOne(@Param('id') id: string, @User() user: UserType) {
+    const { companyId } = user;
+    return this.plansService.findOne(companyId, +id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePlanDto: UpdatePlanDto) {
-    return this.plansService.update(+id, updatePlanDto);
+  update(
+    @Param('id') id: string,
+    @Body() updatePlanDto: UpdatePlanDto,
+    @User() user: UserType,
+  ) {
+    const { companyId } = user;
+    return this.plansService.update(companyId, +id, updatePlanDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.plansService.remove(+id);
+  remove(@Param('id') id: string, @User() user: UserType) {
+    const { companyId } = user;
+    return this.plansService.remove(companyId, +id);
   }
 }

@@ -12,7 +12,10 @@ import { SubcategoryService } from './subcategory.service';
 import { CreateSubcategoryDto } from './dto/create-subcategory.dto';
 import { UpdateSubcategoryDto } from './dto/update-subcategory.dto';
 import { User, UserType } from '../user-auth/user.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('Sub-Category')
 @Controller('subcategory')
 export class SubcategoryController {
   constructor(private readonly subcategoryService: SubcategoryService) {}
@@ -50,20 +53,24 @@ export class SubcategoryController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.subcategoryService.findOne(+id);
+  findOne(@Param('id') id: string, @User() user: UserType) {
+    const { companyId } = user;
+    return this.subcategoryService.findOne(companyId, +id);
   }
 
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateSubcategoryDto: UpdateSubcategoryDto,
+    @Body() updateCategoryDto: UpdateSubcategoryDto,
+    @User() user: UserType,
   ) {
-    return this.subcategoryService.update(+id, updateSubcategoryDto);
+    const { companyId } = user;
+    return this.subcategoryService.update(companyId, +id, updateCategoryDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.subcategoryService.remove(+id);
+  remove(@Param('id') id: string, @User() user: UserType) {
+    const { companyId } = user;
+    return this.subcategoryService.remove(companyId, +id);
   }
 }
