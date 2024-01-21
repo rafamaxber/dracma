@@ -92,9 +92,9 @@ model User {
 model Supplier {
   id        Int                @id @default(autoincrement())
   name      String
-  cnpj      String
-  email     String
-  phone     String
+  cnpj      String?
+  email     String?
+  phone     String?
   company   Company            @relation(fields: [companyId], references: [id])
   companyId Int
   createdAt DateTime           @default(now())
@@ -107,9 +107,9 @@ model Supplier {
 model Customer {
   id        Int       @id @default(autoincrement())
   name      String
-  cnpj      String
-  email     String
-  phone     String
+  cnpj      String?
+  email     String?
+  phone     String?
   company   Company   @relation(fields: [companyId], references: [id])
   companyId Int
   createdAt DateTime  @default(now())
@@ -317,6 +317,7 @@ model ProductFeedstock {
   unit          Unit?           @relation(fields: [unitId], references: [id])
   unitId        Int?
   quantity      Float
+  stockQuantity Float
   supplier      Supplier        @relation(fields: [supplierId], references: [id])
   supplierId    Int
   price         Float

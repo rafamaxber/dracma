@@ -13,17 +13,21 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { User, UserType } from '../user-auth/user.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CreateOrderUseCase } from './user-cases/create-order';
 
 @ApiBearerAuth()
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly service: OrdersService) {}
+  constructor(
+    private readonly service: OrdersService,
+    private readonly createOrderUseCase: CreateOrderUseCase,
+  ) {}
 
   @Post()
   create(@Body() createDto: CreateOrderDto, @User() user: UserType) {
     const { companyId } = user;
-    return this.service.create(companyId, createDto);
+    return this.createOrderUseCase.execute(companyId, createDto);
   }
 
   @Get()

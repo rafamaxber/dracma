@@ -28,10 +28,10 @@ export class SupplierController {
 
   @Get()
   findAll(
-    @Query('perPage') perPage: number,
-    @Query('page') page: number,
-    @Query('name') name: string,
     @User() user: UserType,
+    @Query('perPage') perPage?: number,
+    @Query('page') page?: number,
+    @Query('name') name?: string,
   ) {
     const { companyId } = user;
     const filters = Object.assign(

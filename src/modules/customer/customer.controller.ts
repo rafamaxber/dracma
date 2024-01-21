@@ -8,22 +8,22 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
-import { CustomerService } from './client.service';
-import { CreateClientDto } from './dto/create-client.dto';
-import { UpdateClientDto } from './dto/update-client.dto';
+import { CustomerService } from './customer.service';
+import { CreateCustomerDto } from './dto/create-customer.dto';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { User, UserType } from '../user-auth/user.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiBearerAuth()
 @ApiTags('Customers')
 @Controller('customer')
-export class ClientController {
+export class CustomerController {
   constructor(private readonly clientService: CustomerService) {}
 
   @Post()
-  create(@Body() createClientDto: CreateClientDto, @User() user: UserType) {
+  create(@Body() createDto: CreateCustomerDto, @User() user: UserType) {
     const { companyId } = user;
-    return this.clientService.create(companyId, createClientDto);
+    return this.clientService.create(companyId, createDto);
   }
 
   @Get()
@@ -59,11 +59,11 @@ export class ClientController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateClientDto: UpdateClientDto,
+    @Body() updateDto: UpdateCustomerDto,
     @User() user: UserType,
   ) {
     const { companyId } = user;
-    return this.clientService.update(companyId, +id, updateClientDto);
+    return this.clientService.update(companyId, +id, updateDto);
   }
 
   @Delete(':id')

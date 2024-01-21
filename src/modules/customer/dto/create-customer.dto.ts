@@ -9,7 +9,7 @@ import {
   IsMobilePhone,
 } from 'class-validator';
 
-export class CreateSupplierDto {
+export class CreateCustomerDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(3)

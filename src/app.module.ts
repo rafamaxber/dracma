@@ -13,7 +13,7 @@ import { PlansModule } from './modules/plans/plans.module';
 import { CompanyModule } from './modules/company/company.module';
 import { UserModule } from './modules/user/user.module';
 import { SupplierModule } from './modules/supplier/supplier.module';
-import { ClientModule } from './modules/customer/client.module';
+import { ClientModule } from './modules/customer/customer.module';
 import { BankModule } from './modules/bank/bank.module';
 import { CategoryModule } from './modules/category/category.module';
 import { SubcategoryModule } from './modules/subcategory/subcategory.module';
