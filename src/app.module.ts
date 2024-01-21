@@ -27,7 +27,7 @@ import { AuthGuard } from './modules/user-auth/auth.guard';
 import { ProductModule } from './modules/product/product.module';
 
 import { EmailModule } from './email/email-module';
-import { LoggerMiddleware } from '../middleware/logger.middleware';
+import { LoggerMiddleware } from './middleware/logger.middleware';
 import { ProductCategoryModule } from './modules/product-category/product-category.module';
 import { UnitsModule } from './modules/units/units.module';
 import { FeedstockModule } from './modules/feedstock/feedstock.module';
@@ -39,8 +39,6 @@ import { OrdersModule } from './modules/orders/orders.module';
     CacheModule.register({
       isGlobal: true,
     }),
-    HttpModule,
-    EmailModule,
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,
@@ -59,6 +57,8 @@ import { OrdersModule } from './modules/orders/orders.module';
         expiresIn: process.env.JWT_EXPIRES_IN,
       },
     }),
+    HttpModule,
+    EmailModule,
     AuthModule,
     PlansModule,
     CompanyModule,
