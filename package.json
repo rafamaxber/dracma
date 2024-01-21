@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "engineStrict": true,
+  "main": "dist/main.js",
   "engines": {
     "node": ">=18.x",
     "npm": ">=8.19.3"
