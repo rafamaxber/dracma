@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "engineStrict": true,
   "engines": {
-    "node": ">=19.2.0",
+    "node": ">=18.x",
     "npm": ">=8.19.3"
   },
   "lint-staged": {
