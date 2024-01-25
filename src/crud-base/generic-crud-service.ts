@@ -87,10 +87,8 @@ export class GenericCrud {
     const result = await this.instance.findFirstOrThrow({
       where: {
         companyId: tennatId,
-        AND: {
-          id: id,
-          deletedAt: null,
-        },
+        id: id,
+        deletedAt: null,
       },
     });
 
@@ -103,10 +101,8 @@ export class GenericCrud {
     const result = await this.instance.update({
       where: {
         companyId: tennatId,
-        AND: {
-          id: id,
-          deletedAt: null,
-        },
+        id: id,
+        deletedAt: null,
       },
       data: body,
     });
@@ -120,9 +116,7 @@ export class GenericCrud {
     const result = await this.instance.update({
       where: {
         companyId: tennatId,
-        AND: {
-          id: id,
-        },
+        id: id,
       },
       data: {
         deletedAt: new Date(),
