@@ -12,8 +12,7 @@ import { UnitsService } from './units.service';
 import { CreateUnitDto } from './dto/create-unit.dto';
 import { UpdateUnitDto } from './dto/update-unit.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { User, UserType } from '../user-auth/user.decorator';
-
+// TODO: Incluir permissionamento para apenas administradores
 @ApiBearerAuth()
 @ApiTags('Units of measurement')
 @Controller('units')
@@ -21,9 +20,8 @@ export class UnitsController {
   constructor(private readonly service: UnitsService) {}
 
   @Post()
-  create(@Body() createDto: CreateUnitDto, @User() user: UserType) {
-    const { companyId } = user;
-    return this.service.create(companyId, createDto);
+  create(@Body() createDto: CreateUnitDto) {
+    return this.service.create(createDto);
   }
 
   @Get()
@@ -32,11 +30,8 @@ export class UnitsController {
     @Query('page') page = null,
     @Query('name') name: string,
     // filterQueryDto: FilterQueryDto = { name: '' },
-    @User()
-    user: UserType,
   ) {
     // const { name } = filterQueryDto;
-    const { companyId } = user;
     const cleanName = String(name).trim();
 
     const filters = Object.assign(
@@ -47,7 +42,7 @@ export class UnitsController {
         },
       },
     );
-    return this.service.findAll(companyId, {
+    return this.service.findAll({
       perPage,
       filters,
       page,
@@ -55,24 +50,17 @@ export class UnitsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @User() user: UserType) {
-    const { companyId } = user;
-    return this.service.findOne(companyId, +id);
+  findOne(@Param('id') id: string) {
+    return this.service.findOne(+id);
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateDto: UpdateUnitDto,
-    @User() user: UserType,
-  ) {
-    const { companyId } = user;
-    return this.service.update(companyId, +id, updateDto);
+  update(@Param('id') id: string, @Body() updateDto: UpdateUnitDto) {
+    return this.service.update(+id, updateDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @User() user: UserType) {
-    const { companyId } = user;
-    return this.service.remove(companyId, +id);
+  remove(@Param('id') id: string) {
+    return this.service.remove(+id);
   }
 }

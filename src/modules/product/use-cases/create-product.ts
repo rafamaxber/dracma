@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GenericCrud } from 'src/crud-base/generic-crud-service';
+import { GenericCrud } from '../../../crud-base/generic-crud-service';
 import { PrismaService } from '../../../database/prisma/prisma.service';
 import { CreateProductDto } from '../dto/create-product.dto';
 
@@ -21,6 +21,11 @@ export class CreateProductUseCase extends GenericCrud {
         company: {
           connect: {
             id: tennatId,
+          },
+        },
+        supplier: {
+          connect: {
+            id: Number(product?.supplierId) || null,
           },
         },
         product_category_map: product?.categories && {

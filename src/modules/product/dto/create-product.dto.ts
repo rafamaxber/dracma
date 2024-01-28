@@ -21,6 +21,10 @@ export class CreateProductDto {
   @IsOptional()
   categories?: number[];
 
+  @IsNumber()
+  @IsOptional()
+  supplierId?: number;
+
   @ApiProperty()
   @IsOptional()
   images?: Array<{

@@ -14,6 +14,9 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { User, UserType } from '../user-auth/user.decorator';
 import { CreateProductUseCase } from './use-cases/create-product';
+import { FindAllProductsUseCase } from './use-cases/find-all-product';
+import { UpdateProductUseCase } from './use-cases/update-product';
+import { FindProductUseCase } from './use-cases/find-product';
 
 @ApiBearerAuth()
 @ApiTags('Products')
@@ -22,6 +25,9 @@ export class ProductController {
   constructor(
     private readonly service: ProductService,
     private readonly createProductUseCase: CreateProductUseCase,
+    private readonly findAllProductsUseCase: FindAllProductsUseCase,
+    private readonly updateProductUseCase: UpdateProductUseCase,
+    private readonly findProductUseCase: FindProductUseCase,
   ) {}
 
   @Post()
@@ -44,12 +50,11 @@ export class ProductController {
     const filters = Object.assign(
       {},
       name && {
-        name: {
-          contains: cleanName,
-        },
+        name: cleanName,
       },
     );
-    return this.service.findAll(companyId, {
+
+    return this.findAllProductsUseCase.execute(companyId, {
       perPage,
       filters,
       page,
@@ -59,7 +64,7 @@ export class ProductController {
   @Get(':id')
   findOne(@Param('id') id: string, @User() user: UserType) {
     const { companyId } = user;
-    return this.service.findOne(companyId, +id);
+    return this.findProductUseCase.execute(companyId, +id);
   }
 
   @Patch(':id')
@@ -69,7 +74,7 @@ export class ProductController {
     @User() user: UserType,
   ) {
     const { companyId } = user;
-    return this.service.update(companyId, +id, updateDto);
+    return this.updateProductUseCase.execute(companyId, +id, updateDto);
   }
 
   @Delete(':id')

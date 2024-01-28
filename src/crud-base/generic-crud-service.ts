@@ -87,7 +87,7 @@ export class GenericCrud {
     const result = await this.instance.findFirstOrThrow({
       where: {
         companyId: tennatId,
-        id: id,
+        id,
         deletedAt: null,
       },
     });

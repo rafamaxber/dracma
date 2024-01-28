@@ -13,8 +13,8 @@ import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { PlanEntity } from './entities/plan.entity';
-import { User, UserType } from '../user-auth/user.decorator';
 
+// TODO: Incluir permissionamento para apenas administradores
 @ApiBearerAuth()
 @ApiTags('Plans')
 @Controller('plans')
@@ -23,9 +23,8 @@ export class PlansController {
 
   @Post()
   @ApiCreatedResponse({ type: PlanEntity })
-  create(@Body() createPlanDto: CreatePlanDto, @User() user: UserType) {
-    const { companyId } = user;
-    return this.plansService.create(companyId, createPlanDto);
+  create(@Body() createPlanDto: CreatePlanDto) {
+    return this.plansService.create(createPlanDto);
   }
 
   @Get()
@@ -33,9 +32,7 @@ export class PlansController {
     @Query('perPage') perPage: number,
     @Query('page') page: number,
     @Query('name') name: string,
-    @User() user: UserType,
   ) {
-    const { companyId } = user;
     const cleanName = String(name).trim();
     const filters = Object.assign(
       {},
@@ -45,7 +42,7 @@ export class PlansController {
         },
       },
     );
-    return this.plansService.findAll(companyId, {
+    return this.plansService.findAll({
       perPage,
       filters,
       page,
@@ -53,24 +50,17 @@ export class PlansController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @User() user: UserType) {
-    const { companyId } = user;
-    return this.plansService.findOne(companyId, +id);
+  findOne(@Param('id') id: string) {
+    return this.plansService.findOne(+id);
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updatePlanDto: UpdatePlanDto,
-    @User() user: UserType,
-  ) {
-    const { companyId } = user;
-    return this.plansService.update(companyId, +id, updatePlanDto);
+  update(@Param('id') id: string, @Body() updatePlanDto: UpdatePlanDto) {
+    return this.plansService.update(+id, updatePlanDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @User() user: UserType) {
-    const { companyId } = user;
-    return this.plansService.remove(companyId, +id);
+  remove(@Param('id') id: string) {
+    return this.plansService.remove(+id);
   }
 }
