@@ -40,7 +40,9 @@ export class ProductController {
   findAll(
     @Query('perPage') perPage = null,
     @Query('page') page = null,
-    @Query('name') name: string,
+    @Query('name') name = '',
+    @Query('category') category = '',
+    @Query('code') code = '',
     @User()
     user: UserType,
   ) {
@@ -51,6 +53,12 @@ export class ProductController {
       {},
       name && {
         name: cleanName,
+      },
+      category && {
+        category,
+      },
+      code && {
+        code,
       },
     );
 

@@ -10,6 +10,8 @@ interface FindAllParams {
   orderType?: 'asc' | 'desc';
   filters?: {
     name?: string | null;
+    category?: string | null;
+    code?: string | null;
   };
 }
 
@@ -37,10 +39,34 @@ export class FindAllProductsUseCase extends GenericCrud {
     const tennatId = await this.findTenantIdByCompanyId(companyExternalId);
     const productInstance = this.prismaService.product;
 
+    const where = {};
+
+    if (mappedFilters?.filters?.name) {
+      where['name'] = {
+        contains: mappedFilters.filters.name,
+        mode: 'insensitive',
+      };
+    }
+
+    if (mappedFilters?.filters?.category) {
+      where['product_category_map'] = {
+        some: {
+          category: {
+            id: Number(mappedFilters.filters.category),
+          },
+        },
+      };
+    }
+
+    if (mappedFilters?.filters?.code) {
+      where['code'] = {
+        contains: mappedFilters.filters.code,
+      };
+    }
+
     const [total, results] = await new PrismaService().$transaction([
       productInstance.count({
         where: {
-          ...filters,
           companyId: tennatId,
           deletedAt: null,
         },
@@ -56,7 +82,7 @@ export class FindAllProductsUseCase extends GenericCrud {
         where: {
           companyId: tennatId,
           deletedAt: null,
-          ...mappedFilters.filters,
+          ...where,
         },
         include: {
           product_category_map: {
