@@ -23,7 +23,7 @@ export class CreateProductUseCase extends GenericCrud {
             id: tennatId,
           },
         },
-        supplier: {
+        supplier: product?.supplierId && {
           connect: {
             id: Number(product?.supplierId) || null,
           },
