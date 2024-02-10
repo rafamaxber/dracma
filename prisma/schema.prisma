@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL") // uses connection pooling
+  url      = env("DATABASE_URL") // uses connection pooling
 }
 
 enum Status {
@@ -265,8 +265,8 @@ model Product {
   supplierId               Int?
   supplier                 Supplier?              @relation(fields: [supplierId], references: [id])
   productImages            ProductImages[]
-  product_category_map     Product_Category_Map[]
   recipe                   ProductRecipe[]
+  product_category_map     Product_Category_Map[]
   ProductCategory          ProductCategory[]
   OrderItem                OrderItem[]
 }
@@ -314,18 +314,19 @@ model ProductFeedstock {
   id            Int             @id @default(autoincrement())
   name          String
   description   String
-  unit          Unit?           @relation(fields: [unitId], references: [id])
-  unitId        Int?
+  unitId        Int
   quantity      Float
   stockQuantity Float
-  supplier      Supplier        @relation(fields: [supplierId], references: [id])
-  supplierId    Int
+  supplierId    Int?
   price         Float
-  company       Company         @relation(fields: [companyId], references: [id])
+  isFeedstock   Boolean         @default(false)
   companyId     Int
   deletedAt     DateTime?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
+  unit          Unit?           @relation(fields: [unitId], references: [id])
+  supplier      Supplier?       @relation(fields: [supplierId], references: [id])
+  company       Company         @relation(fields: [companyId], references: [id])
   ProductRecipe ProductRecipe[]
 }
 

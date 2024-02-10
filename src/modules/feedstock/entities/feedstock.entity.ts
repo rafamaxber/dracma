@@ -21,6 +21,9 @@ export class FeedstockEntity implements ProductFeedstock {
   stockQuantity: number;
 
   @ApiProperty()
+  isFeedstock: boolean;
+
+  @ApiProperty({ required: false })
   supplierId: number;
 
   @ApiProperty()
