@@ -2,7 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
-interface FindAllParams {
+export interface FindAllParams {
   perPage?: number;
   page?: number;
   orderBy?: string;

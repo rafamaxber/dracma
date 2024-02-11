@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -22,6 +23,11 @@ export class CreateFeedstockDto {
   @IsOptional()
   @ApiProperty()
   description: string;
+
+  @IsBoolean()
+  @IsOptional()
+  @ApiProperty()
+  isFeedstock: boolean;
 
   @IsNumber()
   @ApiProperty()

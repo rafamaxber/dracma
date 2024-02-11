@@ -313,7 +313,7 @@ model ProductImages {
 model ProductFeedstock {
   id            Int             @id @default(autoincrement())
   name          String
-  description   String
+  description   String?
   unitId        Int
   quantity      Float
   stockQuantity Float
