@@ -19,7 +19,7 @@ export class CreateFeedstockDto {
 
   @IsString()
   @MinLength(3)
-  @MaxLength(130)
+  @MaxLength(256)
   @IsOptional()
   @ApiProperty()
   description: string;

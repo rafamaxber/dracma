@@ -17,9 +17,19 @@ enum Status {
 }
 
 enum Role {
-  admin
+  system_admin
   user_admin
   user
+  worker
+}
+
+model Roles {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  User      User[]
 }
 
 model Plans {
@@ -34,6 +44,8 @@ model Plans {
 model Unit {
   id               Int                @id @default(autoincrement())
   name             String
+  longName         String?
+  description      String?
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   deletedAt        DateTime?
@@ -83,10 +95,12 @@ model User {
   password   String
   company    Company?  @relation(fields: [companyId], references: [id])
   companyId  Int?
+  role       Role?     @default(user)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
   Order      Order[]
+  Roles      Roles[]
 }
 
 model Supplier {
