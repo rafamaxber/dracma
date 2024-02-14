@@ -16,6 +16,13 @@ enum Status {
   canceled
 }
 
+enum ProductStatus {
+  active
+  inactive
+  discontinued
+  removed
+}
+
 enum Role {
   system_admin
   user_admin

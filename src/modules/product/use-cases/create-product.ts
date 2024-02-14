@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Status } from '@prisma/client';
 import { GenericCrud } from '../../../crud-base/generic-crud-service';
 import { PrismaService } from '../../../database/prisma/prisma.service';
 import { CreateProductDto } from '../dto/create-product.dto';
@@ -15,6 +16,16 @@ export class CreateProductUseCase extends GenericCrud {
   ): Promise<any> {
     const tennatId = await this.findTenantIdByCompanyId(companyExternalId);
 
+    const supplierConnect = product?.supplierId
+      ? {
+          supplier: {
+            connect: {
+              id: Number(product?.supplierId) || null,
+            },
+          },
+        }
+      : {};
+
     const result = await this.prismaService.product.create({
       data: {
         name: product.name,
@@ -23,11 +34,7 @@ export class CreateProductUseCase extends GenericCrud {
             id: tennatId,
           },
         },
-        supplier: product?.supplierId && {
-          connect: {
-            id: Number(product?.supplierId) || null,
-          },
-        },
+        ...supplierConnect,
         product_category_map: product?.categories && {
           createMany: {
             data: product.categories.map((categoryId) => ({
@@ -56,7 +63,7 @@ export class CreateProductUseCase extends GenericCrud {
         price_cost: product?.price_cost || null,
         manufacturer: product?.manufacturer || null,
         barcode: product?.barcode || null,
-        status: product?.status || null,
+        status: product?.status || ,
         quantity: product?.quantity || null,
         description: product?.description || null,
         weight: product?.weight || null,
