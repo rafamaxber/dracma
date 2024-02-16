@@ -26,6 +26,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  process.env.NODE_ENV === 'production' && app.enableShutdownHooks();
   app.useGlobalFilters(new HttpExceptionFilter());
   await app.listen(port);
 
