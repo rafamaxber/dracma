@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Status } from '@prisma/client';
 import { GenericCrud } from '../../../crud-base/generic-crud-service';
 import { PrismaService } from '../../../database/prisma/prisma.service';
 import { CreateProductDto } from '../dto/create-product.dto';
+import { ProductStatus } from '@prisma/client';
 
 @Injectable()
 export class CreateProductUseCase extends GenericCrud {
@@ -63,7 +63,7 @@ export class CreateProductUseCase extends GenericCrud {
         price_cost: product?.price_cost || null,
         manufacturer: product?.manufacturer || null,
         barcode: product?.barcode || null,
-        status: product?.status || ,
+        status: product?.status || ('active' as ProductStatus),
         quantity: product?.quantity || null,
         description: product?.description || null,
         weight: product?.weight || null,

@@ -268,7 +268,7 @@ model Product {
   price_cost               Float?
   manufacturer             Boolean?
   barcode                  String?
-  status                   String?                @default("active")
+  status                   ProductStatus?         @default(active)
   quantity                 Int?
   description              String?
   weight                   Float?

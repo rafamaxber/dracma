@@ -8,6 +8,7 @@ import {
   IsNumber,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ProductStatus } from '@prisma/client';
 
 export class CreateProductDto {
   @IsString()
@@ -55,7 +56,7 @@ export class CreateProductDto {
   barcode?: string;
 
   @IsOptional()
-  status?: string;
+  status?: ProductStatus;
 
   @IsNumber()
   @IsOptional()

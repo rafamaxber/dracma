@@ -1,4 +1,4 @@
-import { Product } from '@prisma/client';
+import { Product, ProductStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ProductEntity implements Product {
@@ -33,7 +33,7 @@ export class ProductEntity implements Product {
   barcode: string | null;
 
   @ApiProperty()
-  status: string | null;
+  status: ProductStatus | null;
 
   @ApiProperty()
   quantity: number | null;
