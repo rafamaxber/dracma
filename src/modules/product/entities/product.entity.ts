@@ -79,4 +79,7 @@ export class ProductEntity implements Product {
 
   @ApiProperty()
   productCategoryId: number | null;
+
+  @ApiProperty()
+  color: string | null;
 }

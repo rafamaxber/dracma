@@ -74,22 +74,23 @@ model Company {
   User               User[]
   Supplier           Supplier[]
 
-  Customer             Customer[]
-  Bank                 Bank[]
-  Category             Category[]
-  Subcategory          Subcategory[]
-  Budget               Budget[]
-  Project              Project[]
-  Document             Document[]
-  Account              Account[]
-  Transfer             Transfer[]
-  ProductCategory      ProductCategory[]
-  Product              Product[]
-  Product_Category_Map Product_Category_Map[]
-  ProductRecipe        ProductRecipe[]
-  Feedstock            ProductFeedstock[]
-  Order                Order[]
-  ProductImages        ProductImages[]
+  Customer              Customer[]
+  Bank                  Bank[]
+  Category              Category[]
+  Subcategory           Subcategory[]
+  Budget                Budget[]
+  Project               Project[]
+  Document              Document[]
+  Account               Account[]
+  Transfer              Transfer[]
+  ProductCategory       ProductCategory[]
+  Product               Product[]
+  Product_Category_Map  Product_Category_Map[]
+  ProductRecipe         ProductRecipe[]
+  Feedstock             ProductFeedstock[]
+  Order                 Order[]
+  ProductImages         ProductImages[]
+  ProductCategoryImages ProductCategoryImages[]
 }
 
 model User {
@@ -290,18 +291,21 @@ model Product {
   product_category_map     Product_Category_Map[]
   ProductCategory          ProductCategory[]
   OrderItem                OrderItem[]
+  color                    String?
 }
 
 model ProductCategory {
-  id                   Int                    @id @default(autoincrement())
+  id                   Int                     @id @default(autoincrement())
   name                 String
   deletedAt            DateTime?
-  createdAt            DateTime               @default(now())
-  updatedAt            DateTime               @updatedAt
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
   companyId            Int
-  company              Company                @relation(fields: [companyId], references: [id])
+  company              Company                 @relation(fields: [companyId], references: [id])
   product              Product[]
   Product_Category_Map Product_Category_Map[]
+  images               ProductCategoryImages[]
+  color                String?
 }
 
 model Product_Category_Map {
@@ -328,6 +332,17 @@ model ProductImages {
   product   Product  @relation(fields: [productId], references: [id])
   productId Int
   company   Company  @relation(fields: [companyId], references: [id])
+  companyId Int
+}
+
+model ProductCategoryImages {
+  id        Int             @id @default(autoincrement())
+  imageUrl  String
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  category  ProductCategory @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  company   Company         @relation(fields: [companyId], references: [id])
   companyId Int
 }
 

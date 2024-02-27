@@ -73,6 +73,10 @@ export class CreateProductDto {
   @IsOptional()
   stock?: boolean;
 
+  @IsString()
+  @IsOptional()
+  color?: boolean;
+
   @IsNumber()
   @IsOptional()
   stock_min?: number;

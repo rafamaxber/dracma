@@ -9,6 +9,12 @@ export class ProductCategoryEntity implements ProductCategory {
   name: string;
 
   @ApiProperty()
+  images: string[];
+
+  @ApiProperty()
+  color: string;
+
+  @ApiProperty()
   companyId: number;
 
   @ApiProperty({ required: false, nullable: true })
