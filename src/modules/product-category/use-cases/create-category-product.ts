@@ -16,6 +16,7 @@ export class CreateCategoryProductUseCase extends GenericCrud {
         companyId: tennatId,
         name: body.name,
         color: body?.color || null,
+        parentId: body?.parentId || null,
 
         images: body?.images && {
           createMany: {
@@ -30,6 +31,8 @@ export class CreateCategoryProductUseCase extends GenericCrud {
         name: true,
         color: true,
         images: true,
+        parentId: true,
+        id: true,
       },
     });
 

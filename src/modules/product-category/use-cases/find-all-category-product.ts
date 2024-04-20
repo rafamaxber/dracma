@@ -72,16 +72,31 @@ export class FindAllCategoryProductsUseCase extends GenericCrud {
       }),
     ]);
 
+    const hierarchicalCategories = this.buildHierarchy(results);
+    console.log(JSON.stringify(hierarchicalCategories, null, 2));
     return {
-      results: results.map((result) => ({
-        ...result,
-        images: result.images.map((image) => image.imageUrl),
-      })),
+      results: hierarchicalCategories,
       pagination: {
         page: mappedFilters.page,
         perPage: mappedFilters.perPage,
         total,
       },
     };
+  }
+
+  buildHierarchy(categories, parentId = null) {
+    const filteredCategories = categories.filter(
+      (category) => category.parentId === parentId,
+    );
+
+    const hierarchicalCategories = filteredCategories.map((category) => ({
+      id: category.id,
+      name: category.name,
+      images: category.images.map((image) => image.imageUrl),
+      parentId: category.parentId,
+      categories: this.buildHierarchy(categories, category.id),
+    }));
+
+    return hierarchicalCategories;
   }
 }

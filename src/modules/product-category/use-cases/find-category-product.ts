@@ -20,6 +20,7 @@ export class FindCategoryProductsUseCase extends GenericCrud {
         name: true,
         color: true,
         images: true,
+        parentId: true,
       },
     });
 

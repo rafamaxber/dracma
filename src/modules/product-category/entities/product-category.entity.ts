@@ -5,6 +5,9 @@ export class ProductCategoryEntity implements ProductCategory {
   @ApiProperty()
   id: number;
 
+  @ApiProperty({ required: false, nullable: true })
+  parentId: number;
+
   @ApiProperty()
   name: string;
 
