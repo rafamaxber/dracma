@@ -1,35 +1,37 @@
-version: '3.5'
-
 services:
-  postgres:
-    container_name: postgres_container
-    image: postgres
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
-    ports:
-      - '5432:5432'
-    networks:
-      - postgres
+  nest-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nest-api
     restart: always
+    ports:
+      - ${PORT}:${PORT}
+    environment:
+      - PORT=${PORT:-4000}
+      - API_ENDPOINT=${API_ENDPOINT:-http://localhost:${PORT:-4000}}
+      - DATABASE_URL=${DATABASE_URL:-postgres://postgres:changeme@postgresprisma:5432/dracma-db}
+      - JWT_SECRET=${JWT_SECRET:-10af9c5a03fde8b0a254b901e9e3986db26d51899aeab94ee9d85899070fe53b}
+      - JWT_RESET_PASSWORD_SECRET=${JWT_RESET_PASSWORD_SECRET:-6e984b52308b798355d7a9c64425de310e9b5282fc14c24a921c13338afa6332}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-12h}
+      - JWT_RESET_PASSWORD_EXPIRES_IN=${JWT_RESET_PASSWORD_EXPIRES_IN:-2h}
+      - RESEND_EMAIL_TOKEN=${RESEND_EMAIL_TOKEN:-xxxx}
+    # depends_on:
+    #   - postgres
+    # env_file:
+    #   - .env
 
-  # pgadmin:
-  #   container_name: pgadmin_container
-  #   image: dpage/pgadmin4
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
-  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
-  #     PGADMIN_CONFIG_SERVER_MODE: 'False'
-
-  #   ports:
-  #     - '${PGADMIN_PORT:-5050}:80'
-  #   networks:
-  #     - postgres
+  # postgres:
+  #   image: postgres:15
+  #   container_name: postgresprisma
   #   restart: always
+  #   ports:
+  #     - 5432:5432
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - postgres:/var/lib/postgresql/data
 
-networks:
-  postgres:
-    driver: bridge
 # volumes:
 #   postgres:
-#   pgadmin:
+#     name: nest-prisma-docker-db

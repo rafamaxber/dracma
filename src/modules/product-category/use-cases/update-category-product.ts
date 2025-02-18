@@ -22,10 +22,11 @@ export class UpdateCategoryProductUseCase extends GenericCrud {
       },
       data: {
         companyId: tennatId,
-        name: body.name,
+        name: body?.name,
         color: body?.color || null,
+        parentId: body?.parentId || null,
 
-        images: {
+        images: body?.images && {
           deleteMany: {
             categoryId: id,
             companyId: tennatId,
@@ -42,6 +43,7 @@ export class UpdateCategoryProductUseCase extends GenericCrud {
         name: true,
         color: true,
         images: true,
+        parentId: true,
       },
     });
 

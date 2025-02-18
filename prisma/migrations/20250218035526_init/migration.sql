@@ -2,7 +2,21 @@
 CREATE TYPE "Status" AS ENUM ('open', 'closed', 'canceled');
 
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('admin', 'user_admin', 'user');
+CREATE TYPE "ProductStatus" AS ENUM ('active', 'inactive', 'discontinued', 'removed');
+
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('system_admin', 'user_admin', 'user', 'worker');
+
+-- CreateTable
+CREATE TABLE "Roles" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
+
+    CONSTRAINT "Roles_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Plans" (
@@ -19,6 +33,8 @@ CREATE TABLE "Plans" (
 CREATE TABLE "Unit" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "longName" TEXT,
+    "description" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
@@ -50,6 +66,7 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "companyId" INTEGER,
+    "role" "Role" DEFAULT 'user',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
@@ -217,7 +234,7 @@ CREATE TABLE "Product" (
     "price_cost" DOUBLE PRECISION,
     "manufacturer" BOOLEAN,
     "barcode" TEXT,
-    "status" TEXT DEFAULT 'active',
+    "status" "ProductStatus" DEFAULT 'active',
     "quantity" INTEGER,
     "description" TEXT,
     "weight" DOUBLE PRECISION,
@@ -231,6 +248,7 @@ CREATE TABLE "Product" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
     "supplierId" INTEGER,
+    "color" TEXT,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
@@ -239,10 +257,12 @@ CREATE TABLE "Product" (
 CREATE TABLE "ProductCategory" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "parentId" INTEGER,
     "deletedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "companyId" INTEGER NOT NULL,
+    "color" TEXT,
 
     CONSTRAINT "ProductCategory_pkey" PRIMARY KEY ("id")
 );
@@ -274,15 +294,28 @@ CREATE TABLE "ProductImages" (
 );
 
 -- CreateTable
+CREATE TABLE "ProductCategoryImages" (
+    "id" SERIAL NOT NULL,
+    "imageUrl" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "categoryId" INTEGER NOT NULL,
+    "companyId" INTEGER NOT NULL,
+
+    CONSTRAINT "ProductCategoryImages_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "ProductFeedstock" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "unitId" INTEGER,
+    "description" TEXT,
+    "unitId" INTEGER NOT NULL,
     "quantity" DOUBLE PRECISION NOT NULL,
     "stockQuantity" DOUBLE PRECISION NOT NULL,
-    "supplierId" INTEGER NOT NULL,
+    "supplierId" INTEGER,
     "price" DOUBLE PRECISION NOT NULL,
+    "isFeedstock" BOOLEAN NOT NULL DEFAULT false,
     "companyId" INTEGER NOT NULL,
     "deletedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -337,6 +370,37 @@ CREATE TABLE "OrderItem" (
 );
 
 -- CreateTable
+CREATE TABLE "ExternalStore" (
+    "id" SERIAL NOT NULL,
+    "companyId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
+
+    CONSTRAINT "ExternalStore_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ProductCategoriesInternalExternalMap" (
+    "id" SERIAL NOT NULL,
+    "companyId" INTEGER NOT NULL,
+    "externalStoreId" INTEGER NOT NULL,
+    "productCategoryId" INTEGER NOT NULL,
+    "externalCategoryId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
+
+    CONSTRAINT "ProductCategoriesInternalExternalMap_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "_RolesToUser" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
+);
+
+-- CreateTable
 CREATE TABLE "_ProductToProductCategory" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
@@ -362,6 +426,12 @@ CREATE UNIQUE INDEX "Product_Category_Map_companyId_productId_categoryId_key" ON
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Order_idExternal_key" ON "Order"("idExternal");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_RolesToUser_AB_unique" ON "_RolesToUser"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_RolesToUser_B_index" ON "_RolesToUser"("B");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_ProductToProductCategory_AB_unique" ON "_ProductToProductCategory"("A", "B");
@@ -457,10 +527,16 @@ ALTER TABLE "ProductImages" ADD CONSTRAINT "ProductImages_productId_fkey" FOREIG
 ALTER TABLE "ProductImages" ADD CONSTRAINT "ProductImages_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ProductFeedstock" ADD CONSTRAINT "ProductFeedstock_unitId_fkey" FOREIGN KEY ("unitId") REFERENCES "Unit"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "ProductCategoryImages" ADD CONSTRAINT "ProductCategoryImages_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "ProductCategory"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ProductFeedstock" ADD CONSTRAINT "ProductFeedstock_supplierId_fkey" FOREIGN KEY ("supplierId") REFERENCES "Supplier"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ProductCategoryImages" ADD CONSTRAINT "ProductCategoryImages_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProductFeedstock" ADD CONSTRAINT "ProductFeedstock_unitId_fkey" FOREIGN KEY ("unitId") REFERENCES "Unit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProductFeedstock" ADD CONSTRAINT "ProductFeedstock_supplierId_fkey" FOREIGN KEY ("supplierId") REFERENCES "Supplier"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ProductFeedstock" ADD CONSTRAINT "ProductFeedstock_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -491,6 +567,24 @@ ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("or
 
 -- AddForeignKey
 ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ExternalStore" ADD CONSTRAINT "ExternalStore_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProductCategoriesInternalExternalMap" ADD CONSTRAINT "ProductCategoriesInternalExternalMap_externalStoreId_fkey" FOREIGN KEY ("externalStoreId") REFERENCES "ExternalStore"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProductCategoriesInternalExternalMap" ADD CONSTRAINT "ProductCategoriesInternalExternalMap_productCategoryId_fkey" FOREIGN KEY ("productCategoryId") REFERENCES "ProductCategory"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProductCategoriesInternalExternalMap" ADD CONSTRAINT "ProductCategoriesInternalExternalMap_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_RolesToUser" ADD CONSTRAINT "_RolesToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Roles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_RolesToUser" ADD CONSTRAINT "_RolesToUser_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_ProductToProductCategory" ADD CONSTRAINT "_ProductToProductCategory_A_fkey" FOREIGN KEY ("A") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -8,8 +8,9 @@ export class FindCategoryProductsUseCase extends GenericCrud {
     super(prismaService.productCategory);
   }
 
-  async execute(companyExternalId: string, id: number): Promise<any> {
+  async execute(companyExternalId: string, id: number) {
     const tennatId = await this.findTenantIdByCompanyId(companyExternalId);
+
     const result = await this.prismaService.productCategory.findFirst({
       where: {
         id,
@@ -23,6 +24,10 @@ export class FindCategoryProductsUseCase extends GenericCrud {
         parentId: true,
       },
     });
+
+    if (!result) {
+      return null;
+    }
 
     return {
       ...result,

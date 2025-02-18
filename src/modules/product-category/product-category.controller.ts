@@ -41,20 +41,14 @@ export class ProductCategoryController {
 
   @Get()
   findAll(
-    @Query('perPage') perPage = null,
-    @Query('page') page = null,
     @Query('name') name: string,
-    // filterQueryDto: FilterQueryDto = { name: '' },
     @User()
     user: UserType,
   ) {
-    // const { name } = filterQueryDto;
     const { companyId } = user;
     const cleanName = String(name || '').trim();
 
     return this.findAllCategoryProducts.execute(companyId, {
-      perPage,
-      page,
       filters: {
         name: cleanName,
       },

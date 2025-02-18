@@ -5,10 +5,12 @@ import { CreateCategoryProductUseCase } from './use-cases/create-category-produc
 import { FindAllCategoryProductsUseCase } from './use-cases/find-all-category-product';
 import { FindCategoryProductsUseCase } from './use-cases/find-category-product';
 import { UpdateCategoryProductUseCase } from './use-cases/update-category-product';
+import { ProductCategoryBuilder } from './product-category-builder';
 
 @Module({
   controllers: [ProductCategoryController],
   providers: [
+    ProductCategoryBuilder,
     ProductCategoryService,
     CreateCategoryProductUseCase,
     FindAllCategoryProductsUseCase,
