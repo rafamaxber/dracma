@@ -7,15 +7,7 @@ services:
     restart: always
     ports:
       - ${PORT}:${PORT}
-    environment:
-      - PORT=${PORT:-4000}
-      - API_ENDPOINT=${API_ENDPOINT:-http://localhost:${PORT:-4000}}
-      - DATABASE_URL=${DATABASE_URL:-postgres://postgres:changeme@postgresprisma:5432/dracma-db}
-      - JWT_SECRET=${JWT_SECRET:-10af9c5a03fde8b0a254b901e9e3986db26d51899aeab94ee9d85899070fe53b}
-      - JWT_RESET_PASSWORD_SECRET=${JWT_RESET_PASSWORD_SECRET:-6e984b52308b798355d7a9c64425de310e9b5282fc14c24a921c13338afa6332}
-      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-12h}
-      - JWT_RESET_PASSWORD_EXPIRES_IN=${JWT_RESET_PASSWORD_EXPIRES_IN:-2h}
-      - RESEND_EMAIL_TOKEN=${RESEND_EMAIL_TOKEN:-xxxx}
+    network_mode: host
     # depends_on:
     #   - postgres
     # env_file:
