@@ -6,6 +6,7 @@ import {
   MinLength,
   IsOptional,
   IsArray,
+  IsNumber,
 } from 'class-validator';
 
 export class CreateProductCategoryDto {
@@ -25,4 +26,9 @@ export class CreateProductCategoryDto {
   @IsArray()
   @ApiProperty()
   images: string[];
+
+  @IsNumber()
+  @IsOptional()
+  @ApiProperty()
+  parentId: number;
 }

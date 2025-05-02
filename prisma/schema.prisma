@@ -74,23 +74,25 @@ model Company {
   User               User[]
   Supplier           Supplier[]
 
-  Customer              Customer[]
-  Bank                  Bank[]
-  Category              Category[]
-  Subcategory           Subcategory[]
-  Budget                Budget[]
-  Project               Project[]
-  Document              Document[]
-  Account               Account[]
-  Transfer              Transfer[]
-  ProductCategory       ProductCategory[]
-  Product               Product[]
-  Product_Category_Map  Product_Category_Map[]
-  ProductRecipe         ProductRecipe[]
-  Feedstock             ProductFeedstock[]
-  Order                 Order[]
-  ProductImages         ProductImages[]
-  ProductCategoryImages ProductCategoryImages[]
+  Customer                             Customer[]
+  Bank                                 Bank[]
+  Category                             Category[]
+  Subcategory                          Subcategory[]
+  Budget                               Budget[]
+  Project                              Project[]
+  Document                             Document[]
+  Account                              Account[]
+  Transfer                             Transfer[]
+  ProductCategory                      ProductCategory[]
+  Product                              Product[]
+  Product_Category_Map                 Product_Category_Map[]
+  ProductRecipe                        ProductRecipe[]
+  Feedstock                            ProductFeedstock[]
+  Order                                Order[]
+  ProductImages                        ProductImages[]
+  ProductCategoryImages                ProductCategoryImages[]
+  ExternalStore                        ExternalStore[]
+  ProductCategoriesInternalExternalMap ProductCategoriesInternalExternalMap[]
 }
 
 model User {
@@ -295,17 +297,19 @@ model Product {
 }
 
 model ProductCategory {
-  id                   Int                     @id @default(autoincrement())
-  name                 String
-  deletedAt            DateTime?
-  createdAt            DateTime                @default(now())
-  updatedAt            DateTime                @updatedAt
-  companyId            Int
-  company              Company                 @relation(fields: [companyId], references: [id])
-  product              Product[]
-  Product_Category_Map Product_Category_Map[]
-  images               ProductCategoryImages[]
-  color                String?
+  id                                   Int                                    @id @default(autoincrement())
+  name                                 String
+  parentId                             Int?
+  deletedAt                            DateTime?
+  createdAt                            DateTime                               @default(now())
+  updatedAt                            DateTime                               @updatedAt
+  companyId                            Int
+  company                              Company                                @relation(fields: [companyId], references: [id])
+  product                              Product[]
+  Product_Category_Map                 Product_Category_Map[]
+  images                               ProductCategoryImages[]
+  ProductCategoriesInternalExternalMap ProductCategoriesInternalExternalMap[]
+  color                                String?
 }
 
 model Product_Category_Map {
@@ -336,14 +340,14 @@ model ProductImages {
 }
 
 model ProductCategoryImages {
-  id        Int             @id @default(autoincrement())
-  imageUrl  String
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-  category  ProductCategory @relation(fields: [categoryId], references: [id])
+  id         Int             @id @default(autoincrement())
+  imageUrl   String
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  category   ProductCategory @relation(fields: [categoryId], references: [id])
   categoryId Int
-  company   Company         @relation(fields: [companyId], references: [id])
-  companyId Int
+  company    Company         @relation(fields: [companyId], references: [id])
+  companyId  Int
 }
 
 model ProductFeedstock {
@@ -410,4 +414,29 @@ model OrderItem {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+}
+
+model ExternalStore {
+  id        Int       @id @default(autoincrement())
+  companyId Int
+  company   Company   @relation(fields: [companyId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  ProductCategoriesInternalExternalMap ProductCategoriesInternalExternalMap[]
+}
+
+model ProductCategoriesInternalExternalMap {
+  id                 Int             @id @default(autoincrement())
+  companyId          Int
+  externalStoreId    Int
+  externalStore      ExternalStore   @relation(fields: [externalStoreId], references: [id])
+  productCategory    ProductCategory @relation(fields: [productCategoryId], references: [id])
+  productCategoryId  Int
+  externalCategoryId String
+  company            Company         @relation(fields: [companyId], references: [id])
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  deletedAt          DateTime?
 }
